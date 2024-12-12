@@ -1,8 +1,11 @@
-[gd_scene load_steps=7 format=3 uid="uid://pumqado4va0i"]
+[gd_scene load_steps=12 format=3 uid="uid://pumqado4va0i"]
 
 [ext_resource type="Texture2D" uid="uid://44451rhd0qqn" path="res://Textures/Player/player_sprite.png" id="1_matd5"]
 [ext_resource type="Script" path="res://Player/player.gd" id="1_pvxk3"]
 [ext_resource type="PackedScene" uid="uid://csutr2pyla0oy" path="res://Utility/hurt_box.tscn" id="3_uphac"]
+[ext_resource type="Texture2D" uid="uid://c0mmq6xq4lc5x" path="res://Textures/GUI/exp_background.png" id="4_s2k8v"]
+[ext_resource type="Texture2D" uid="uid://b65hmfajmvuwf" path="res://Textures/GUI/exp_progress.png" id="5_4sd3o"]
+[ext_resource type="FontFile" uid="uid://dqwa8r70yy7oj" path="res://Font/tenderness.otf" id="6_l24mx"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_mji3n"]
 radius = 5.0
@@ -13,6 +16,11 @@ size = Vector2(12, 22)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_1twot"]
 radius = 369.628
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2hnlc"]
+radius = 50.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_trifd"]
 
 [node name="Player" type="CharacterBody2D" groups=["player"]]
 motion_mode = 1
@@ -70,6 +78,48 @@ monitorable = false
 [node name="CollisionShape2D" type="CollisionShape2D" parent="EnemyDetectionArea"]
 shape = SubResource("CircleShape2D_1twot")
 
+[node name="GrabArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GrabArea"]
+shape = SubResource("CircleShape2D_2hnlc")
+
+[node name="CollectArea" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="CollectArea"]
+shape = SubResource("CircleShape2D_trifd")
+
+[node name="GUILayer" type="CanvasLayer" parent="."]
+
+[node name="GUI" type="Control" parent="GUILayer"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 1600.0
+offset_bottom = 900.0
+
+[node name="ExperienceBar" type="TextureProgressBar" parent="GUILayer/GUI"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture_under = ExtResource("4_s2k8v")
+texture_progress = ExtResource("5_4sd3o")
+
+[node name="lbl_level" type="Label" parent="GUILayer/GUI/ExperienceBar"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 540.0
+offset_right = 640.0
+offset_bottom = 20.0
+theme_override_fonts/font = ExtResource("6_l24mx")
+theme_override_font_sizes/font_size = 16
+text = "Level: 1"
+horizontal_alignment = 1
+vertical_alignment = 2
+
 [connection signal="hurt" from="HurtBox" to="." method="_on_hurt_box_hurt"]
 [connection signal="timeout" from="Attack/IceSpearTimer" to="." method="_on_ice_spear_timer_timeout"]
 [connection signal="timeout" from="Attack/IceSpearTimer/IceSpearAttackTimer" to="." method="_on_ice_spear_attack_timer_timeout"]
@@ -77,5 +127,7 @@ shape = SubResource("CircleShape2D_1twot")
 [connection signal="timeout" from="Attack/TornadoTimer/TornadoAttackTimer" to="." method="_on_tornado_attack_timer_timeout"]
 [connection signal="body_entered" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_entered"]
 [connection signal="body_exited" from="EnemyDetectionArea" to="." method="_on_enemy_detection_area_body_exited"]
+[connection signal="area_entered" from="GrabArea" to="." method="_on_grab_area_area_entered"]
+[connection signal="area_entered" from="CollectArea" to="." method="_on_collect_area_area_entered"]
 
 [editable path="HurtBox"]

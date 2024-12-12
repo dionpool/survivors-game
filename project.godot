@@ -11,14 +11,15 @@ config_version=5
 [application]
 
 config/name="Survivors Clone"
-run/main_scene="res://World/world.tscn"
+run/main_scene="res://Interface/menu.tscn"
 config/features=PackedStringArray("4.3", "Mobile")
 config/icon="res://icon.svg"
 
 [display]
 
-window/size/viewport_width=960
-window/size/viewport_height=540
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/size/mode=3
 window/size/window_width_override=1920
 window/size/window_height_override=1080
 window/stretch/mode="canvas_items"

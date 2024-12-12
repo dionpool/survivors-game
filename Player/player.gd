@@ -1,9 +1,15 @@
 extends CharacterBody2D
 
+
 #Character variables
 var movement_speed = 40.0
 var hp = 80
 var last_movement = Vector2.UP
+
+#Experience
+var experience = 0
+var experience_level = 1
+var collected_experience = 0
 
 #Attack variables
 var iceSpear = preload("res://Player/Attack/ice_spear.tscn")
@@ -21,16 +27,16 @@ var javelin = preload("res://Player/Attack/javelin.tscn")
 var icespear_ammo = 0
 var icespear_baseammo = 1
 var icespear_attackspeed = 1.5
-var icespear_level = 1 #TODO: Temporarily disabled
+var icespear_level = 1 #TODO: Temporarily enabled
 
 #Tornado variables
 var tornado_ammo = 0
 var tornado_baseammo = 1
 var tornado_attackspeed = 3
-var tornado_level = 1 #TODO: Temporarily disabled
+var tornado_level = 1 #TODO: Temporarily enabled
 
 #Javelin variables
-var javelin_ammo = 0
+var javelin_ammo = 5
 var javelin_level = 1
 
 #Enemy related
@@ -39,10 +45,15 @@ var enemy_close = []
 #Ready function to start attack
 func _ready():
 	attack()
+	set_expbar(experience, calculate_experience_cap())
 
 #Sprite onready variables
 @onready var sprite = $Sprite2D
 @onready var walkTimer = get_node("%walkTimer")
+
+#GUI
+@onready var expBar = get_node("%ExperienceBar")
+@onready var lblLevel = get_node("%lbl_level")
 
 #Physics function to trigger movement
 func _physics_process(_delta):
@@ -134,15 +145,13 @@ func _on_tornado_attack_timer_timeout():
 			tornadoAttackTimer.start()
 		else:
 			tornadoAttackTimer.stop()
-
-#Spawn javelin function
+			
 func spawn_javelin():
 	var get_javelin_total = javelinBase.get_child_count()
 	var calc_spawns = javelin_ammo - get_javelin_total
 	
 	while calc_spawns > 0:
 		var javelin_spawn = javelin.instantiate()
-		
 		javelin_spawn.global_position = global_position
 		javelinBase.add_child(javelin_spawn)
 		calc_spawns -= 1
@@ -163,3 +172,43 @@ func _on_enemy_detection_area_body_entered(body):
 func _on_enemy_detection_area_body_exited(body):
 	if enemy_close.has(body):
 		enemy_close.erase(body)
+
+func _on_grab_area_area_entered(area: Area2D) -> void:
+	if area.is_in_group("loot"):
+		area.target = self
+
+func _on_collect_area_area_entered(area: Area2D) -> void:
+	if area.is_in_group("loot"):
+		var gem_exp = area.collect()
+		calculate_experience(gem_exp)
+		
+func calculate_experience(gem_exp):
+	var exp_required = calculate_experience_cap()
+	collected_experience += gem_exp
+	if experience + collected_experience >= exp_required: #Level up
+		collected_experience -= exp_required - experience
+		experience_level += 1
+		lblLevel.text = str("Level: ", experience_level)
+		experience = 0
+		exp_required = calculate_experience_cap()
+		calculate_experience(0)
+	else:
+		experience += collected_experience
+		collected_experience = 0
+		
+	set_expbar(experience, exp_required)
+	
+func calculate_experience_cap():
+	var exp_cap = experience_level
+	if experience_level < 20:
+		exp_cap = experience_level * 5
+	elif experience_level < 40:
+		exp_cap + 95 * (experience_level - 19) * 8
+	else:
+		exp_cap = 255 + (experience_level - 39) * 12
+	
+	return exp_cap
+	
+func set_expbar(set_value = 1, set_max_value = 100):
+	expBar.value = set_value
+	expBar.max_value = set_max_value

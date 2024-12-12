@@ -1,0 +1,49 @@
+[gd_scene load_steps=4 format=3 uid="uid://dbafacfe0bjco"]
+
+[ext_resource type="Script" path="res://Interface/menu.gd" id="1_5sr3p"]
+[ext_resource type="Texture2D" uid="uid://bguh147ob2bu1" path="res://Textures/Backgrounds/background_vampire_wizard.png" id="1_tx5ge"]
+[ext_resource type="PackedScene" uid="uid://k1lxs5cfcf2m" path="res://Interface/quit_button.tscn" id="3_jw8x6"]
+
+[node name="Menu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5sr3p")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 0
+offset_right = 1600.0
+offset_bottom = 900.0
+texture = ExtResource("1_tx5ge")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="Content" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -800.0
+offset_top = -450.0
+offset_right = 800.0
+offset_bottom = 450.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ButtonGroup" type="HBoxContainer" parent="Content"]
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="Content/ButtonGroup"]
+layout_mode = 2
+text = "Start"
+
+[node name="QuitButton" parent="Content/ButtonGroup" instance=ExtResource("3_jw8x6")]
+layout_mode = 2
+
+[connection signal="pressed" from="Content/ButtonGroup/StartButton" to="." method="_on_start_button_pressed"]
+[connection signal="pressed" from="Content/ButtonGroup/QuitButton" to="Content/ButtonGroup/QuitButton" method="_on_pressed"]
